@@ -1,0 +1,18 @@
+# config file
+interval: 1
+image_paths:
+  - './images/'
+  - './masks/'
+  - './masks/'
+  - './masks/'
+  - './masks/'
+  - './masks/'
+label_names:
+  - 'Input'
+  - 'GT'
+  - 'Net1 ( ICCV)'
+  - 'Net2 ( CVPR)'
+  - 'Net3 ( ECCV)'
+  - 'Net (Ours)'
+output_path: './output/'
+# file_name_suffix: 0 .jpg, other .png

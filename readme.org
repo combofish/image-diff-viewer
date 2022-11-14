@@ -1,0 +1,21 @@
+* Image Diff Viewer
+
+Image Diff viewer effectively compares and finds the difference between several images.
+
+** Introduction
+
+This is an Image Compare Software, that can read images automatically under different directories with the same file name to display.
+
+[[https://github.com/combofish/image-diff-viewer/blob/main/Usage.png][file:Usage.gif]]
+
+** Runtime
+
+- PyQt
+
+** Usage
+
+Set ~image_paths~ and ~label_names~ in *config.yaml* file.
+
+** License
+
+   [MIT](http://opensource.org/licenses/MIT) 
