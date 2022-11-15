@@ -16,6 +16,12 @@ This is an Image Compare Software, that can read images automatically under diff
 
 Set ~image_paths~ and ~label_names~ in *config.yaml* file.
 
+#+BEGIN_SRC shell
+  python ./ImageDiffViewer.py  # 
+  python ./PickoutImages.py  # pick out images from {./output/result.txt}, and save to {./output/images}.
+#+END_SRC
+
+
 ** License
 
    [MIT](http://opensource.org/licenses/MIT) 
