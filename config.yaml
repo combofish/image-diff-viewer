@@ -10,9 +10,10 @@ image_paths:
 label_names:
   - 'Input'
   - 'GT'
+  - 'Net (Ours)'
   - 'Net1 ( ICCV)'
   - 'Net2 ( CVPR)'
   - 'Net3 ( ECCV)'
-  - 'Net (Ours)'
+
 output_path: './output/'
 # file_name_suffix: 0 .jpg, other .png

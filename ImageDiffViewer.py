@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-# Author: Combofish
-# Filename: ImageDiffViewer.py
-
 import os
 import sys
 
@@ -145,7 +140,8 @@ class QMyWidget(QWidget):
 
         for _img, _lab in zip(images, self.img_labels):
             _lab.clear()
-            _lab.setPixmap(QPixmap.fromImage(_img))
+            _lab.setPixmap(_img)
+            _lab.setScaledContents(True)
 
     def __init_exit_button(self):
         # exit button
@@ -170,6 +166,9 @@ class QMyWidget(QWidget):
             _lab.setAlignment(Qt.AlignCenter)
             _lab.setText(f'{_str}')
 
+        # red
+        string_labels[2].setStyleSheet('color: red')
+
     def __init_image_labels(self):
         positions = [(i, j) for i in range(2) for j in range(3)]
         _Q_labels = []
@@ -182,11 +181,21 @@ class QMyWidget(QWidget):
 
     def __init_image_names(self, paths):
         # ===== init images ===== #
+        # read names from path
         image_names = [
             img_name.split('.')[0] for img_name in os.listdir(paths[0])
             if img_name.endswith('.jpg')
         ]
+
+        # # read names from file
+        # with open(osp.join(self.output_path, 'result_bak.txt')) as f:
+        #     names = f.readline().strip()
+        # image_names = set(names.split(','))
+
+        # use
         self.image_names = sorted(image_names)
+        print(self.image_names)
+        print(len(self.image_names))
         self.image_numbers = len(self.image_names)
 
         # update text label
@@ -210,7 +219,7 @@ def load_images_by_name(paths, name):
     if debug_flag:
         print('\n'.join(outs_path))
 
-    outs = [QImage(_path) for _path in outs_path]
+    outs = [QPixmap(_path) for _path in outs_path]
     return outs
 
 
@@ -228,6 +237,6 @@ def main(interval, paths, label_names, output_path):
 
 
 if __name__ == '__main__':
-    configs = config_parser()
+    configs = config_parser(config_file_path='./config.yaml')
     # print(configs)
     main(*configs)
