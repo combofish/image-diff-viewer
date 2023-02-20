@@ -1,3 +1,4 @@
+import argparse
 import os
 import os.path as osp
 import shutil
@@ -5,29 +6,36 @@ import shutil
 from yaml_parser import config_parser
 
 
-def pick_out_images(image_paths, label_names, output_path):
-    with open(osp.join(output_path, 'result.txt')) as f:
-        names = f.readline()
+def main(interval, paths, label_names, output_path):
+    with open('./output/result-bak-comp-self.txt') as f:
+        names = f.readline().split(',')
+        print(names)
 
-    dest_path = osp.join(output_path, 'images')
-    if not osp.exists(dest_path):
-        os.mkdir(dest_path)
+        dest_path = './output/res-comp-self/'
+        if not os.path.exists(dest_path):
+            os.mkdir(dest_path)
 
-    for name in names.split(','):
-        for idx, (_img_path, _label_name) in enumerate(zip(image_paths, label_names)):
-            if idx == 0:
-                src_img = osp.join(_img_path, f'{name}.jpg')
-                dst_img = osp.join(dest_path, f'{name}_{_label_name}.jpg')
-            else:
-                src_img = osp.join(_img_path, f'{name}.png')
-                dst_img = osp.join(dest_path, f'{name}_{_label_name}.png')
+        for _str, path in zip(label_names, paths):
+            print(path)
+            for name in names:
+                if osp.exists(osp.join(path, f'{name}.png')):
+                    shutil.copy(
+                        osp.join(path, f'{name}.png'),
+                        osp.join(dest_path, f'{name}_{_str}.png')
+                    )
 
-            print(f'Copying from "{src_img}" to "{dst_img}".')
-            shutil.copy(src_img, dst_img)
+                elif osp.exists(osp.join(path, f'{name}.jpg')):
+                    shutil.copy(
+                        osp.join(path, f'{name}.jpg'),
+                        osp.join(dest_path, f'{name}_{_str}.jpg')
+                    )
 
 
 if __name__ == '__main__':
-    configs = config_parser(config_file_path='./config.yaml')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, default='config.yaml')
+    cfg = parser.parse_args()
 
-    interval, image_paths, label_names, output_path = configs
-    pick_out_images(image_paths, label_names, output_path)
+    configs = config_parser(cfg.config)
+    # print(configs)
+    main(*configs)

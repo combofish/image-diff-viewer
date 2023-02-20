@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author: Combofish
+# Filename: ImageDiffViewer.py
+
 import os
 import sys
 
@@ -9,6 +14,7 @@ from form import Ui_Form
 import os.path as osp
 import time
 
+import argparse
 from yaml_parser import config_parser
 
 debug_flag = False
@@ -32,10 +38,29 @@ class WorkThread(QThread):
             self.trigger.emit()
 
 
+def generate_q_labels(numbers, widget):
+    """Generate labels for show titles."""
+    positions = [(0, j) for j in range(numbers)]
+
+    _Q_labels = []
+    for position in positions:
+        _label = QLabel("--")
+        _Q_labels.append(_label)
+        widget.addWidget(_label, *position)
+
+    return _Q_labels
+
+
 class QMyWidget(QWidget):
     def __init__(self, parent=None, paths=[], label_names=[], interval=1, output_path='./output/'):
         super(QMyWidget, self).__init__(parent)
         self.paths = paths
+
+        # gen show images numbers
+        # self.numbers = 12
+        self.show_numbers = len(paths)
+        self.__show_numbers_down = self.show_numbers // 2
+        self.__show_numbers_up = self.show_numbers - self.__show_numbers_down
 
         # setup ui
         self.__ui = Ui_Form()
@@ -140,8 +165,7 @@ class QMyWidget(QWidget):
 
         for _img, _lab in zip(images, self.img_labels):
             _lab.clear()
-            _lab.setPixmap(_img)
-            _lab.setScaledContents(True)
+            _lab.setPixmap(QPixmap.fromImage(_img))
 
     def __init_exit_button(self):
         # exit button
@@ -155,22 +179,40 @@ class QMyWidget(QWidget):
         self.__ui.label_2.setText("Current index:")
         self.__ui.label_3.setText("Total number:")
 
-        # label string center, use label names
-        string_labels = [
-            self.__ui.label, self.__ui.label_7,
-            self.__ui.label_8, self.__ui.label_9,
-            self.__ui.label_10, self.__ui.label_11
-        ]
+        # # label string center, use label names
+        # string_labels = [
+        #     self.__ui.label, self.__ui.label_7,
+        #     self.__ui.label_8, self.__ui.label_9,
+        #     self.__ui.label_10, self.__ui.label_11
+        # ]
+        #
+        # for _lab, _str in zip(string_labels, label_names):
+        #     _lab.setAlignment(Qt.AlignCenter)
+        #     _lab.setText(f'{_str}')
 
-        for _lab, _str in zip(string_labels, label_names):
+        # gen up labels
+        self.name_labels_up = generate_q_labels(
+            numbers=self.__show_numbers_up,
+            widget=self.__ui.gridLayout_2
+        )
+
+        self.name_labels_down = generate_q_labels(
+            numbers=self.__show_numbers_down,
+            widget=self.__ui.gridLayout_3
+        )
+
+        # bind name to label
+        __name_label_list = []
+        __name_label_list.extend(self.name_labels_up)
+        __name_label_list.extend(self.name_labels_down)
+
+        for _lab, _str in zip(__name_label_list, label_names):
             _lab.setAlignment(Qt.AlignCenter)
             _lab.setText(f'{_str}')
 
-        # red
-        string_labels[2].setStyleSheet('color: red')
-
     def __init_image_labels(self):
-        positions = [(i, j) for i in range(2) for j in range(3)]
+
+        positions = [(i, j) for i in range(2) for j in range(self.__show_numbers_up)]
         _Q_labels = []
         for position in positions:
             _label = QLabel('----')
@@ -181,21 +223,16 @@ class QMyWidget(QWidget):
 
     def __init_image_names(self, paths):
         # ===== init images ===== #
-        # read names from path
         image_names = [
             img_name.split('.')[0] for img_name in os.listdir(paths[0])
             if img_name.endswith('.jpg')
         ]
 
-        # # read names from file
-        # with open(osp.join(self.output_path, 'result_bak.txt')) as f:
-        #     names = f.readline().strip()
-        # image_names = set(names.split(','))
+        # # from names
+        # __strs = '1262,0668,1377,1548,1569,1611,0852,1582,1381,0558,1372,0657,0101,0224,0856,0923,0268,1236,0131,1378,0319,1253,0563,1546,1502,0322,0156,0095,0900,1581,0642,0887,0307,0202,0843,1462,0921,1258,0323,1602,0612,0137,0088,0082,0866,1415,1399,1284,1254,1607'
+        # image_names = __strs.split(',')
 
-        # use
         self.image_names = sorted(image_names)
-        print(self.image_names)
-        print(len(self.image_names))
         self.image_numbers = len(self.image_names)
 
         # update text label
@@ -219,7 +256,7 @@ def load_images_by_name(paths, name):
     if debug_flag:
         print('\n'.join(outs_path))
 
-    outs = [QPixmap(_path) for _path in outs_path]
+    outs = [QImage(_path) for _path in outs_path]
     return outs
 
 
@@ -237,6 +274,10 @@ def main(interval, paths, label_names, output_path):
 
 
 if __name__ == '__main__':
-    configs = config_parser(config_file_path='./config.yaml')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, default='config.yaml')
+    cfg = parser.parse_args()
+
+    configs = config_parser(cfg.config)
     # print(configs)
     main(*configs)
