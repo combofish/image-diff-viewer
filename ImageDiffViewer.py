@@ -167,6 +167,9 @@ class QMyWidget(QWidget):
             _lab.clear()
             _lab.setPixmap(QPixmap.fromImage(_img))
 
+            # scale image
+            _lab.setScaledContents(True)
+
     def __init_exit_button(self):
         # exit button
         exit_btn = self.__ui.exit_button
